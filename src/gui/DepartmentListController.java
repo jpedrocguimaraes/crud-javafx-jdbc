@@ -1,9 +1,12 @@
 package gui;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import application.Main;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -12,8 +15,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import model.entities.Department;
+import model.services.DepartmentService;
 
 public class DepartmentListController implements Initializable {
+	
+	private DepartmentService service;
 	
 	@FXML
 	private Button btNew;
@@ -28,8 +34,26 @@ public class DepartmentListController implements Initializable {
 	private TableColumn<Department, String> tableColumnName;
 	
 	@FXML
+	private ObservableList<Department> obsDepartments;
+	
+	@FXML
 	public void onBtNewAction() {
 		System.out.println("onBtNewAction");
+	}
+	
+	public void setDepartmentService(DepartmentService service) {
+		this.service = service;
+	}
+	
+	
+	public void updateTableView() {
+		if(service == null) {
+			throw new IllegalStateException("Service está nulo");
+		}
+		
+		List<Department> departments = service.findAll();
+		obsDepartments = FXCollections.observableArrayList(departments);
+		tableViewDepartment.setItems(obsDepartments);
 	}
 	
 	@Override
@@ -38,8 +62,8 @@ public class DepartmentListController implements Initializable {
 	}
 	
 	private void initializeNodes() {
-		tableColumnID.setCellValueFactory(new PropertyValueFactory<>("ID"));
-		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("Nome"));
+		tableColumnID.setCellValueFactory(new PropertyValueFactory<>("id"));
+		tableColumnName.setCellValueFactory(new PropertyValueFactory<>("name"));
 		
 		Stage stage = (Stage) Main.getMainScene().getWindow();
 		tableViewDepartment.prefHeightProperty().bind(stage.heightProperty());
